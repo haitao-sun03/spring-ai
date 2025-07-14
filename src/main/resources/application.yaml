@@ -1,0 +1,36 @@
+spring:
+  application:
+      name: ai
+
+  ai:
+    dashscope:
+      base-url: https://dashscope.aliyuncs.com
+      api-key: sk-f6dfb68603b64576b5194f33f7d0dbfe
+      chat:
+        options:
+          model: qwen-plus
+          temperature: 0.8
+      embedding:
+        options:
+          model: text-embedding-v4
+          dimensions: 1536
+      vision:
+        options:
+          model: qvq-max
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vector_db
+    username: admin
+    password: 123456
+    vector-store:
+      pgvector:
+        initialize-schema: true
+        dimensions: 1536
+
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
+    com.haitao.ai: debug
+    org.springframework.ai.embedding: debug
+
