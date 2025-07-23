@@ -16,6 +16,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,9 @@ public class CommonConfiguration {
 
     @Value("${spring.ai.dashscope.vision.options.model}")
     private String visionModel;
+
+    @Autowired
+    private DBChatMemoryRepository dbChatMemoryRepository;
 
 
     //图片理解
@@ -60,7 +64,7 @@ public class CommonConfiguration {
     public ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository) {
         return MessageWindowChatMemory
                 .builder()
-                .chatMemoryRepository(chatMemoryRepository)
+                .chatMemoryRepository(dbChatMemoryRepository)
                 .maxMessages(20)
                 .build();
 

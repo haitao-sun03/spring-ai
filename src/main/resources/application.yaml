@@ -26,6 +26,9 @@ spring:
       pgvector:
         initialize-schema: true
         dimensions: 1536
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 
 logging:
