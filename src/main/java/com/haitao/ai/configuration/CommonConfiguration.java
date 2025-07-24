@@ -3,6 +3,7 @@ package com.haitao.ai.configuration;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
+import com.haitao.ai.advisor.ReReadingAdvisor;
 import com.haitao.ai.service.BookingService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -94,6 +95,7 @@ public class CommonConfiguration {
                 .builder(model)
                 .defaultSystem("你是XX航空的智能客服，办事认真，靠谱，善解人意！")
                 .defaultAdvisors(new SimpleLoggerAdvisor(),
+                        new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
                         new QuestionAnswerAdvisor(vectorStore)
                 )
