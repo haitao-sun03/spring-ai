@@ -59,4 +59,11 @@ knife4j:
   setting:
     language: zh_cn
 
+forbidden:
+  version: 1.0.0
+  words:
+    - 色情
+    - 毒品
+    - 赌博
+
 

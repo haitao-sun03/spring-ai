@@ -1,7 +1,10 @@
 package com.haitao.ai.controller;
 
+import com.haitao.ai.exception.BusinessException;
+import com.haitao.ai.exception.ErrorCode;
 import com.haitao.ai.model.ApiResponse;
 import com.haitao.ai.service.DocumentService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,24 +18,17 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
+    @SneakyThrows
     @PostMapping
     public ApiResponse<String> uploadDocument(@RequestParam("file") MultipartFile file) {
-        try {
-            String documentId = UUID.randomUUID().toString();
-            documentService.uploadDocument(file, documentId);
-            return ApiResponse.success(documentId);
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to upload document: " + e.getMessage());
-        }
+        String documentId = UUID.randomUUID().toString();
+        documentService.uploadDocument(file, documentId);
+        return ApiResponse.success(documentId);
     }
 
     @DeleteMapping("/{documentId}")
     public ApiResponse<String> deleteDocument(@PathVariable String documentId) {
-        try {
-            documentService.deleteDocument(documentId);
-            return ApiResponse.success("Document deleted successfully");
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to delete document: " + e.getMessage());
-        }
+        documentService.deleteDocument(documentId);
+        return ApiResponse.success("Document deleted successfully");
     }
 }

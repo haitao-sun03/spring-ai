@@ -3,6 +3,7 @@ package com.haitao.ai.configuration;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
+import com.haitao.ai.advisor.ForbiddenWordsAdvisor;
 import com.haitao.ai.advisor.ReReadingAdvisor;
 import com.haitao.ai.service.BookingService;
 import org.springframework.ai.chat.client.ChatClient;
@@ -10,11 +11,8 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.util.Arrays;
 
 @Configuration
 public class CommonConfiguration {
@@ -38,6 +34,9 @@ public class CommonConfiguration {
     private String defaultSystem;
     @Autowired
     private DBChatMemoryRepository dbChatMemoryRepository;
+
+    @Autowired
+    private ForbiddenWordsAdvisor forbiddenWordsAdvisor;
 
 
     //图片理解
@@ -99,7 +98,8 @@ public class CommonConfiguration {
                 .defaultAdvisors(new SimpleLoggerAdvisor(),
                         new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                        new QuestionAnswerAdvisor(vectorStore)
+                        new QuestionAnswerAdvisor(vectorStore),
+                        forbiddenWordsAdvisor
                 )
                 .defaultTools(bookingService)
                 .build();
