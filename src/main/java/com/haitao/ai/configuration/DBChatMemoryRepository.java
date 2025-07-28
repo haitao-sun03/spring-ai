@@ -66,8 +66,6 @@ public class DBChatMemoryRepository implements ChatMemoryRepository {
         return entity;
     }
 
-    // 其他方法不变
-
     private Message toMessage(ChatMessageEntity entity) {
         String messageType = entity.getMessageType();
         String content = entity.getContent();

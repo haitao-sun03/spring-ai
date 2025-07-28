@@ -34,6 +34,8 @@ public class CommonConfiguration {
     @Value("${spring.ai.dashscope.vision.options.model}")
     private String visionModel;
 
+    @Value("${spring.ai.client.default-system}")
+    private String defaultSystem;
     @Autowired
     private DBChatMemoryRepository dbChatMemoryRepository;
 
@@ -55,18 +57,18 @@ public class CommonConfiguration {
 
 
     //LLM对话记忆
-    @Bean
-    public ChatMemoryRepository chatMemoryRepository() {
-        return new InMemoryChatMemoryRepository();
-    }
+//    @Bean
+//    public ChatMemoryRepository chatMemoryRepository() {
+//        return new InMemoryChatMemoryRepository();
+//    }
 
     //LLM对话记忆
     @Bean
-    public ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository) {
+    public ChatMemory chatMemory() {
         return MessageWindowChatMemory
                 .builder()
                 .chatMemoryRepository(dbChatMemoryRepository)
-                .maxMessages(20)
+                .maxMessages(10)
                 .build();
 
     }
@@ -93,7 +95,7 @@ public class CommonConfiguration {
                                  VectorStore vectorStore) {
         return ChatClient
                 .builder(model)
-                .defaultSystem("你是XX航空的智能客服，办事认真，靠谱，善解人意！")
+                .defaultSystem(defaultSystem)
                 .defaultAdvisors(new SimpleLoggerAdvisor(),
                         new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
