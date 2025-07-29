@@ -22,13 +22,15 @@ public class RagDashScopeCloudAdvisorConfig {
     @Value("${spring.ai.dashscope.api-key}")
     private String apiKey;
 
+    @Value("${spring.ai.dashscope.knowledge-index}")
+    private String dashScopeKnowledgeIndex;
+
     @Bean
     public Advisor ragDashScopeCloudAdvisor() {
         DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(apiKey).build();
-        final String KNOWLEDGE_INDEX = "面试";
         DocumentRetriever retriever = new DashScopeDocumentRetriever(dashScopeApi,
                 DashScopeDocumentRetrieverOptions.builder()
-                        .withIndexName(KNOWLEDGE_INDEX)
+                        .withIndexName(dashScopeKnowledgeIndex)
                         .withDenseSimilarityTopK(3)
                         .build());
 

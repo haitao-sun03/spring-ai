@@ -6,6 +6,7 @@ spring:
     client:
       default-system: 你是一位有10年经验的Java开发招聘专家，负责发现简历的问题，并给出改进建议(若有)以及原因
     dashscope:
+      knowledge-index: 面试
       base-url: https://dashscope.aliyuncs.com
       api-key: sk-f6dfb68603b64576b5194f33f7d0dbfe
       chat:
