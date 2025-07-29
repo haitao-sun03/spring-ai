@@ -6,9 +6,11 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationP
 import com.haitao.ai.advisor.ForbiddenWordsAdvisor;
 import com.haitao.ai.advisor.ReReadingAdvisor;
 import com.haitao.ai.service.BookingService;
+import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -37,6 +39,9 @@ public class CommonConfiguration {
 
     @Autowired
     private ForbiddenWordsAdvisor forbiddenWordsAdvisor;
+
+    @Resource
+    private Advisor ragDashScopeCloudAdvisor;
 
 
     //图片理解
@@ -98,7 +103,8 @@ public class CommonConfiguration {
                 .defaultAdvisors(new SimpleLoggerAdvisor(),
                         new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                        new QuestionAnswerAdvisor(vectorStore),
+//                        new QuestionAnswerAdvisor(vectorStore),
+                        ragDashScopeCloudAdvisor,
                         forbiddenWordsAdvisor
                 )
                 .defaultTools(bookingService)

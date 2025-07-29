@@ -26,7 +26,6 @@ public class VectorStoreManager {
     private final VectorStore vectorStore;
     private final Parser tikaParser;
 
-    @Autowired
     public VectorStoreManager(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
         this.tikaParser = new AutoDetectParser();
