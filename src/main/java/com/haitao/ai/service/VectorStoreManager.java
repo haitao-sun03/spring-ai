@@ -1,16 +1,13 @@
 package com.haitao.ai.service;
 
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
@@ -18,17 +15,15 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class VectorStoreManager {
 
     private final VectorStore vectorStore;
-    private final Parser tikaParser;
+
 
     public VectorStoreManager(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
-        this.tikaParser = new AutoDetectParser();
     }
 
     /**
@@ -38,16 +33,15 @@ public class VectorStoreManager {
      * @return 处理后的文档块数量
      */
     public int addDocument(MultipartFile file, String documentId) throws IOException, TikaException, SAXException {
-        String content = extractTextFromFile(file);
-        
-        Document document = new Document(content);
-        document.getMetadata().put("document_id", documentId);
-        document.getMetadata().put("file_name", file.getOriginalFilename());
-        document.getMetadata().put("file_type", file.getContentType());
-        document.getMetadata().put("file_size", String.valueOf(file.getSize()));
-        
+        List<Document> documents = extractTextFromFile(file);
+//        处理metadata
+        for (Document document : documents) {
+            document.getMetadata().put("document_id", documentId);
+            document.getMetadata().put("resource_name", file.getOriginalFilename());
+        }
+
         TextSplitter textSplitter = new TokenTextSplitter();
-        List<Document> splitDocuments = textSplitter.split(List.of(document));
+        List<Document> splitDocuments = textSplitter.split(documents);
         
         vectorStore.accept(splitDocuments);
         return splitDocuments.size();
@@ -56,16 +50,13 @@ public class VectorStoreManager {
     /**
      * 从文件中提取文本内容
      */
-    private String extractTextFromFile(MultipartFile file) throws IOException, TikaException, SAXException {
-        Metadata metadata = new Metadata();
-        metadata.set("resourceName", file.getOriginalFilename());
-        
+    private List<Document> extractTextFromFile(MultipartFile file) throws IOException, TikaException, SAXException {
+
         try (InputStream inputStream = file.getInputStream()) {
-            BodyContentHandler handler = new BodyContentHandler(-1); // -1表示不限制输出长度
-            ParseContext context = new ParseContext();
-            
-            tikaParser.parse(inputStream, handler, metadata, context);
-            return handler.toString();
+            // 将 MultipartFile 的 InputStream 转换为 Resource
+            InputStreamResource resource = new InputStreamResource(inputStream);
+            TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
+            return tikaDocumentReader.read();
         }
     }
 

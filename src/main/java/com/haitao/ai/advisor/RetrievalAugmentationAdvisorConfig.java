@@ -10,14 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * spring-ai-alibaba的DashScopeDocumentRetriever实现了DocumentRetriever接口
- * 用于从阿里百炼灵基知识库进行切片查询
- *
- * 使用RetrievalAugmentationAdvisor能够自定义documentRetriever，从而从外部知识库进行切片搜索
- */
+
 @Configuration
-public class RagDashScopeCloudAdvisorConfig {
+public class RetrievalAugmentationAdvisorConfig {
 
     @Value("${spring.ai.dashscope.api-key}")
     private String apiKey;
@@ -25,6 +20,11 @@ public class RagDashScopeCloudAdvisorConfig {
     @Value("${spring.ai.dashscope.knowledge-index}")
     private String dashScopeKnowledgeIndex;
 
+    /**
+     * spring-ai-alibaba的DashScopeDocumentRetriever实现了DocumentRetriever接口
+     * 用于从阿里百炼灵基知识库进行切片查询
+     * 使用RetrievalAugmentationAdvisor能够自定义documentRetriever，从而从外部知识库进行切片搜索
+     */
     @Bean
     public Advisor ragDashScopeCloudAdvisor() {
         DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(apiKey).build();

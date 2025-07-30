@@ -104,7 +104,7 @@ public class CommonConfiguration {
                         new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
 //                        new QuestionAnswerAdvisor(vectorStore),
-                        ragDashScopeCloudAdvisor,
+//                        ragDashScopeCloudAdvisor,
                         forbiddenWordsAdvisor
                 )
                 .defaultTools(bookingService)
