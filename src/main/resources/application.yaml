@@ -1,10 +1,10 @@
 spring:
   application:
-      name: ai-agent
+    name: ai-agent
 
   ai:
     client:
-      default-system: 你是一位有10年经验的Java开发招聘专家，负责发现简历的问题，并给出改进建议(若有)以及原因
+      default-system: 你是一个机票业务的专业人员，可以借助相关工具进行帮助AI大模型进行相关操作
     dashscope:
       knowledge-index: 面试
       base-url: https://dashscope.aliyuncs.com
@@ -29,6 +29,10 @@ spring:
       pgvector:
         initialize-schema: true
         dimensions: 1536
+        distance-type: COSINE_DISTANCE
+        max-document-batch-size: 10000
+        schema-name: public
+        vector-table-name: airline_vector_store
   jpa:
     hibernate:
       ddl-auto: update

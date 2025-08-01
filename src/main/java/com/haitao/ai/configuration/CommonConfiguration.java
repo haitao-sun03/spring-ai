@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.Map;
+
 @Configuration
 public class CommonConfiguration {
 
@@ -100,7 +102,7 @@ public class CommonConfiguration {
         return ChatClient
                 .builder(model)
                 .defaultSystem(defaultSystem)
-                .defaultAdvisors(new SimpleLoggerAdvisor(),
+                .defaultAdvisors(new SimpleLoggerAdvisor(5),
                         new ReReadingAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
 //                        new QuestionAnswerAdvisor(vectorStore),
@@ -108,6 +110,7 @@ public class CommonConfiguration {
                         forbiddenWordsAdvisor
                 )
                 .defaultTools(bookingService)
+                .defaultToolContext(Map.of("userName","张三"))
                 .build();
     }
 
