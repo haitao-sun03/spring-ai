@@ -15,6 +15,8 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +100,8 @@ public class CommonConfiguration {
     public ChatClient chatClient(DashScopeChatModel model,
                                  BookingService bookingService,
                                  ChatMemory chatMemory,
-                                 VectorStore vectorStore) {
+                                 VectorStore vectorStore,
+                                 SyncMcpToolCallbackProvider mcpToolCallbackProvider) {
         return ChatClient
                 .builder(model)
                 .defaultSystem(defaultSystem)
@@ -109,7 +112,9 @@ public class CommonConfiguration {
 //                        ragDashScopeCloudAdvisor,
                         forbiddenWordsAdvisor
                 )
-                .defaultTools(bookingService)
+//                .defaultTools(bookingService)
+//                通过ToolCallbackProvider将mcp提供的工具注册
+                .defaultToolCallbacks(mcpToolCallbackProvider)
                 .defaultToolContext(Map.of("userName","张三"))
                 .build();
     }

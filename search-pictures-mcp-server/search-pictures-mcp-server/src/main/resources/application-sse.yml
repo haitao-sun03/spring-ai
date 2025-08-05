@@ -1,0 +1,9 @@
+spring:
+  ai:
+    mcp:
+      server:
+        name: search-picture-mcp-server
+        version: 1.0.0
+        type: SYNC
+        # sse
+        stdio: false

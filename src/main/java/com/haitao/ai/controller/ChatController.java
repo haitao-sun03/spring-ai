@@ -83,7 +83,7 @@ public class ChatController {
             String result = chatClient.prompt()
                     .user(input)
                     .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
-                    .advisors(RagVectorStoreAdvisorFactory.create(vectorStore, ContextualQueryAugmenterFactory.create(false), metadata))
+//                    .advisors(RagVectorStoreAdvisorFactory.create(vectorStore, ContextualQueryAugmenterFactory.create(false), metadata))
                     .call()
                     .content();
 //                    .entity(ChatRecord.class);

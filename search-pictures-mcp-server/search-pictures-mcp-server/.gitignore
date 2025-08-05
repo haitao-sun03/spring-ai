@@ -31,7 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### custom ###
-application-local.yaml
-tmp

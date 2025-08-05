@@ -1,6 +1,8 @@
 spring:
   application:
     name: ai-agent
+  profiles:
+    active: local
 
   ai:
     client:
@@ -8,7 +10,7 @@ spring:
     dashscope:
       knowledge-index: 面试
       base-url: https://dashscope.aliyuncs.com
-      api-key: sk-f6dfb68603b64576b5194f33f7d0dbfe
+#      api-key: your-api-key
       chat:
         options:
           model: qwen-plus
@@ -20,6 +22,15 @@ spring:
       vision:
         options:
           model: qvq-max
+    mcp:
+      client:
+        sse:
+          connections:
+            server1:
+              url: http://localhost:8127
+#        stdio:
+#          servers-configuration: classpath:mcp-servers.json
+
 
   datasource:
     url: jdbc:postgresql://localhost:5432/vector_db
