@@ -37,7 +37,7 @@ public class PDFGenerationTool {
 //                PdfFont font = PdfFontFactory.createFont(fontPath,
 //                        PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
                 // 使用内置中文字体
-                PdfFont font = PdfFontFactory.createFont("STSongStd-Light", "UniGB-UCS2-H");
+                PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H");
                 document.setFont(font);
                 // 创建段落
                 Paragraph paragraph = new Paragraph(content);

@@ -1,5 +1,7 @@
 package com.haitao.ai.tools;
 
+import com.haitao.ai.service.BookServiceServiceImpl;
+import com.haitao.ai.service.BookingService;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +26,9 @@ public class ToolRegistration {
         TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
         PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
         TerminateTool terminateTool = new TerminateTool();
+        BookingService bookingService = new BookServiceServiceImpl();
         return ToolCallbacks.from(
+                bookingService,
                 fileOperationTool,
                 webSearchTool,
                 webScrapingTool,

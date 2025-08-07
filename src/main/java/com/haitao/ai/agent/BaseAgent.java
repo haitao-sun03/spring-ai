@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Data
 @Slf4j
@@ -54,13 +56,68 @@ public abstract class BaseAgent {
                 status = AgentStatusEnum.FINISHED;
                 results.add("已达到maxStep：" + maxStep + ", agent stop");
             }
-//            重置为IDLE
-            status = AgentStatusEnum.IDEL;
             return String.join("\n", results);
         } catch (Exception e) {
             log.error("run fail,the exception is: {}", e.getMessage());
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, e.getMessage());
         }
+    }
+
+
+    public SseEmitter runSSE(String userPrompt) {
+        SseEmitter sseEmitter = new SseEmitter(180000l);
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (status != AgentStatusEnum.IDEL) {
+                    sseEmitter.send(ErrorCode.AGENT_NOT_IDLE.getMessage());
+                    sseEmitter.complete();
+                    return;
+                }
+
+                if (StrUtil.isBlank(userPrompt)) {
+                    sseEmitter.send(ErrorCode.AGENT_USER_PROMPT_NOT_ALLOW_BLANK.getMessage());
+                    sseEmitter.complete();
+                    return;
+                }
+            } catch (Exception ex) {
+                sseEmitter.completeWithError(ex);
+            }
+
+            messages.add(new UserMessage(userPrompt));
+
+            try {
+                while (status != AgentStatusEnum.FINISHED && currentStep <= maxStep) {
+                    currentStep++;
+                    String res = step();
+                    log.info("第{}/{}步，该步结果为: {}", currentStep, maxStep, res);
+                    sseEmitter.send(res);
+                }
+
+                if (currentStep >= maxStep) {
+                    status = AgentStatusEnum.FINISHED;
+                    sseEmitter.send("已达到maxStep：" + maxStep + ", agent stop");
+                }
+                sseEmitter.complete();
+            } catch (Exception e) {
+                log.error("runSSE fail,the exception is: {}", e.getMessage());
+                sseEmitter.completeWithError(e);
+            }
+        });
+        sseEmitter.onCompletion(() -> {
+            if (this.status == AgentStatusEnum.RUNNING) {
+                this.status = AgentStatusEnum.FINISHED;
+            }
+            log.info("SSE connection completed");
+        });
+
+        sseEmitter.onTimeout(() -> {
+            this.status = AgentStatusEnum.ERROR;
+            log.warn("SSE connection timeout");
+        });
+
+
+        return sseEmitter;
+
     }
 
 

@@ -18,8 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
@@ -83,12 +86,47 @@ public class ChatController {
             String result = chatClient.prompt()
                     .user(input)
                     .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
-//                    .advisors(RagVectorStoreAdvisorFactory.create(vectorStore, ContextualQueryAugmenterFactory.create(false), metadata))
+                    .advisors(RagVectorStoreAdvisorFactory.create(vectorStore, ContextualQueryAugmenterFactory.create(false), metadata))
                     .call()
                     .content();
 //                    .entity(ChatRecord.class);
             return ApiResponse.success(result);
         }
+    }
+
+
+    /**
+     * @param sessionId
+     * @param input
+     * @return
+     */
+    @SneakyThrows
+    @PostMapping(value = "/chatWithSSE", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<ApiResponse<String>>> chatWithSSE(@RequestParam("sessionId") String sessionId,
+                                                                 @RequestParam("input") String input,
+                                                                 @Parameter(
+                                                         description = "元数据键值对（JSON格式）",
+                                                         example = "{\"key1\":\"value1\",\"key2\":\"value2\"}"
+                                                 )
+                                                 @RequestParam(value = "metadata", required = false) String metadataJson) {
+
+        Map<String, String> metadata = null;
+        if (metadataJson != null) {
+            metadata = new ObjectMapper().readValue(metadataJson, new TypeReference<Map<String, String>>() {
+            });
+        }
+
+        Flux<String> contentFlux = chatClient.prompt()
+                .user(input)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+                .advisors(RagVectorStoreAdvisorFactory.create(vectorStore, ContextualQueryAugmenterFactory.create(false), metadata))
+                .stream()
+                .content();
+
+        return contentFlux.map(content ->
+                ServerSentEvent.builder(ApiResponse.success(content))
+                        .build()
+        );
     }
 
 

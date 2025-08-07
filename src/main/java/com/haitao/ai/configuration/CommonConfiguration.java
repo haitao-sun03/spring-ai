@@ -98,7 +98,6 @@ public class CommonConfiguration {
     //对话客户端初始化
     @Bean
     public ChatClient chatClient(DashScopeChatModel model,
-                                 BookingService bookingService,
                                  ChatMemory chatMemory,
                                  VectorStore vectorStore,
                                  SyncMcpToolCallbackProvider mcpToolCallbackProvider) {
